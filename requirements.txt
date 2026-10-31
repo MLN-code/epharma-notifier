@@ -1,0 +1,5 @@
+qfieldcloud-sdk
+requests
+pyproj
+gTTS
+anthropic
