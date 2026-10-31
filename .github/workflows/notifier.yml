@@ -1,1 +1,41 @@
+name: Notifier les signalements E_pharma
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"   # toutes les 10 minutes
+  workflow_dispatch:          # bouton "Run workflow" pour tester à la main
+
+permissions:
+  contents: write             # pour mémoriser etat.json
+
+concurrency:
+  group: notifier
+  cancel-in-progress: false
+
+jobs:
+  notifier:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+      - run: pip install -q -r requirements.txt
+      - name: Lancer le notificateur
+        env:
+          QFC_URL: ${{ secrets.QFC_URL }}
+          QFC_USERNAME: ${{ secrets.QFC_USERNAME }}
+          QFC_PASSWORD: ${{ secrets.QFC_PASSWORD }}
+          QFC_PROJECT: ${{ secrets.QFC_PROJECT }}
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python notifier.py
+      - name: Mémoriser les signalements déjà envoyés
+        run: |
+          git config user.name "notifier-bot"
+          git config user.email "notifier-bot@users.noreply.github.com"
+          git add etat.json
+          git diff --cached --quiet || (git commit -m "Mise à jour etat" && git push)
 
