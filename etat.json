@@ -1,5 +1,6 @@
 {
  "notifies": [
-  "{0306acd8-a0e4-4693-94be-accae8be2da4}"
+  "{0306acd8-a0e4-4693-94be-accae8be2da4}",
+  "{9fba5e77-3ef3-4b4c-8074-8757ffc0dfef}"
  ]
 }
